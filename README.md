@@ -1,5 +1,18 @@
 # Dart Side
 
+![](https://badgen.net/github/release/DizoftTeam/dart_side)
+![](https://badgen.net/github/stars/DizoftTeam/dart_side)
+![](https://badgen.net/github/forks/DizoftTeam/dart_side)
+![](https://badgen.net/github/issues/DizoftTeam/dart_side)
+![](https://badgen.net/github/open-issues/DizoftTeam/dart_side)
+![](https://badgen.net/github/license/DizoftTeam/dart_side)
+![](https://badgen.net/github/tag/DizoftTeam/dart_side)
+![](https://badgen.net/pub/v/dart_side)
+![](https://badgen.net/pub/likes/dart_side)
+![](https://badgen.net/pub/points/dart_side)
+![](https://badgen.net/pub/popularity/dart_side)
+![](https://badgen.net/pub/sdk-version/dart_side)
+
 Simple and Pure Dart Http server
 
 ## Usage
