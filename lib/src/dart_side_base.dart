@@ -123,7 +123,7 @@ class DServer {
 
         final Handler hFind = rHandlers.firstWhere(
           (Handler handler) {
-            final RegExp regExp = new RegExp(handler.rPath!.toString());
+            final RegExp regExp = RegExp(handler.rPath!.toString());
 
             if (regExp.hasMatch(rPath)) {
               return true;
