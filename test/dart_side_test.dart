@@ -2,15 +2,16 @@ import 'package:dart_side/dart_side.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
-    Awesome awesome;
+  // TODO: Wanna Test!
+  // group('A group of tests', () {
+  //   Awesome awesome;
 
-    setUp(() {
-      awesome = Awesome();
-    });
+  //   setUp(() {
+  //     awesome = Awesome();
+  //   });
 
-    test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
-    });
-  });
+  //   test('First Test', () {
+  //     expect(awesome.isAwesome, isTrue);
+  //   });
+  // });
 }
