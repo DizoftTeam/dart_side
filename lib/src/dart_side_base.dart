@@ -151,7 +151,7 @@ class DServer {
           path = '';
           isError = false;
 
-          final Object result = hFind.callback.call();
+          final Object result = await hFind.callback.call();
 
           request.response.write(jsonEncode(
             <String, dynamic>{
@@ -163,7 +163,7 @@ class DServer {
       }
 
       if (path != '') {
-        final Object result = _routes[method]![path]!.callback.call();
+        final Object result = await _routes[method]![path]!.callback.call();
 
         isError = false;
 
