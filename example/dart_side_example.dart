@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_side/dart_side.dart';
+import 'package:dart_side/request_extension.dart';
 
 Future<void> main() async {
   final HttpServer server = await HttpServer.bind(
@@ -16,8 +17,8 @@ Future<void> main() async {
     method: Method.GET,
     handler: Handler(
       path: '/v1/schedules',
-      callback: () {
-        // Somthing like Paginate list
+      callback: (HttpRequest request) {
+        // Something like Paginate list
         return <String, dynamic>{
           'items': <String>[
             'schedule 1',
@@ -35,10 +36,15 @@ Future<void> main() async {
     method: Method.GET,
     handler: Handler(
       rPath: r'/v1/schedules/\d+',
-      callback: () {
+      callback: (HttpRequest request) async {
+        /// Get JSON Data
+        /// If is not JSON = [Null] will be provided
+        final dynamic jsonData = await request.json();
+
         return <String, dynamic>{
           'read': 'schedule',
           'id': -1,
+          'json': jsonData,
         };
       },
     ),

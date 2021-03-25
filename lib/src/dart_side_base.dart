@@ -27,7 +27,7 @@ class Handler {
   Pattern? rPath;
 
   /// Callback
-  Object Function() callback;
+  Object Function(HttpRequest request) callback;
 
   /// Constructor
   Handler({
@@ -131,7 +131,7 @@ class DServer {
 
             return false;
           },
-          orElse: () => Handler(callback: () => ''),
+          orElse: () => Handler(callback: (_) => ''),
         );
 
         // Still not found - Route not found!
@@ -151,7 +151,7 @@ class DServer {
           path = '';
           isError = false;
 
-          final Object result = await hFind.callback.call();
+          final Object result = await hFind.callback.call(request);
 
           request.response.write(jsonEncode(
             <String, dynamic>{
@@ -163,7 +163,9 @@ class DServer {
       }
 
       if (path != '') {
-        final Object result = await _routes[method]![path]!.callback.call();
+        final Object result = await _routes[method]![path]!.callback.call(
+              request,
+            );
 
         isError = false;
 
