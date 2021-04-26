@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_side/src/exceptions/side_exception.dart';
+
 /// HTTP methods
 enum Method {
   /// GET
@@ -17,6 +19,19 @@ enum Method {
 }
 
 ///
+/// Посредник
+///
+abstract class Pipeline<T> {
+  /// Посредник
+  const Pipeline();
+
+  ///
+  /// Запускаемое действие
+  ///
+  Future<T> run(T value);
+}
+
+///
 /// Handler
 ///
 class Handler {
@@ -26,6 +41,12 @@ class Handler {
   /// Regex path
   Pattern? rPath;
 
+  /// Набор посредников на запрос
+  List<Pipeline<HttpRequest>> middleware;
+
+  /// Набор посредников на ответ TODO: ждет реализации
+  List<Pipeline<dynamic>> postMiddleware;
+
   /// Callback
   Object Function(HttpRequest request) callback;
 
@@ -34,6 +55,8 @@ class Handler {
     this.path,
     this.rPath,
     required this.callback,
+    this.middleware = const <Pipeline<HttpRequest>>[],
+    this.postMiddleware = const <Pipeline>[],
   });
 }
 
@@ -54,9 +77,6 @@ class DServer {
     required Method method,
     required Handler handler,
   }) {
-    // assert(handler.path != null && handler.rPath == null);
-    // assert(handler.rPath != null && handler.path == null);
-
     if (_routes[method] == null) {
       _routes[method] = <String, Handler>{};
     }
@@ -109,6 +129,8 @@ class DServer {
             orElse: () => empty,
           );
 
+      Handler? handler = null;
+
       // Try find by RegExp
       if (path == empty) {
         final Map<String, Handler> handlers = _routes[method]!;
@@ -151,30 +173,77 @@ class DServer {
           path = '';
           isError = false;
 
-          final Object result = await hFind.callback.call(request);
-
-          request.response.write(jsonEncode(
-            <String, dynamic>{
-              'success': true,
-              'result': result,
-            },
-          ));
+          handler = hFind;
         }
+      } else {
+        handler = _routes[method]![path]!;
       }
 
-      if (path != '') {
-        final Object result = await _routes[method]![path]!.callback.call(
-              request,
-            );
+      // Handler найден!
+      if (handler != null) {
+        Object? result = null;
+        bool hasException = false;
+        bool middlewareException = false;
 
-        isError = false;
+        // Побежали по middleware
+        if (handler.middleware.isNotEmpty) {
+          try {
+            for (Pipeline<HttpRequest> middleware in handler.middleware) {
+              await middleware.run(request);
+            }
+          } catch (e) {
+            middlewareException = true;
 
-        request.response.write(jsonEncode(
-          <String, dynamic>{
-            'success': true,
-            'result': result,
-          },
-        ));
+            request.response.statusCode = HttpStatus.internalServerError;
+
+            print(e);
+
+            request.response.write(jsonEncode(
+              <String, dynamic>{
+                'success': false,
+                'system': false,
+                'middleware': true,
+                'error': e is Exception ? '$e' : 'Middleware Error',
+              },
+            ));
+
+            isError = false;
+          }
+        }
+
+        if (!middlewareException) {
+          try {
+            result = await handler.callback.call(request);
+          } catch (e) {
+            hasException = true;
+            isError = false;
+
+            request.response.statusCode = HttpStatus.internalServerError;
+
+            final Map<String, dynamic> data = <String, dynamic>{
+              'success': false,
+              'system': false,
+              'error': e is Exception ? '$e' : 'Internal Server Error',
+            };
+
+            if (e is SideException) {
+              data['info'] = e.data;
+            }
+
+            request.response.write(jsonEncode(data));
+          }
+
+          if (!hasException) {
+            isError = false;
+
+            request.response.write(jsonEncode(
+              <String, dynamic>{
+                'success': true,
+                'result': result,
+              },
+            ));
+          }
+        }
       }
     }
 

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 
 ///
-/// This extendsion add some methods for simple work with request
+/// This extension add some methods for simple work with request
 ///
 extension DartSideRequest on HttpRequest {
   ///

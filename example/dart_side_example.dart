@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_side/dart_side.dart';
-import 'package:dart_side/request_extension.dart';
+import 'package:dart_side/src/extensions/request_extension.dart';
 
 Future<void> main() async {
   final HttpServer server = await HttpServer.bind(
